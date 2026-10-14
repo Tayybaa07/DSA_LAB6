@@ -1,0 +1,16 @@
+# Executables & Binaries
+*.exe
+*.out
+*.o
+*.obj
+a.out
+*.class
+
+# macOS System Files
+.DS_Store
+
+# Executables with no extension (common in C/C++ on macOS/Linux)
+*
+!*.*
+!README.md
+!.gitignore
