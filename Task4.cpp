@@ -1,31 +1,52 @@
 #include <iostream>
 #include <vector>
 #include <iomanip>
+#include <algorithm>
 
 using namespace std;
 
-// Checks if position is inside the board
+// Checks if position is inside the board 
 bool isSafe(int x, int y, int N, const vector<vector<int>>& board) {
     return (x >= 0 && x < N && y >= 0 && y < N && board[x][y] == -1);
 }
 
-// Recursive backtracking algorithm 
-bool solveKnightTour(int x, int y, int moveNum, int N, vector<vector<int>>& board, const int dx[], const int dy[]) {
-    if (moveNum == N * N + 1) return true; // 
-
+// Counts onward moves from a square 
+int countMoves(int x, int y, int N, const vector<vector<int>>& board, const int dx[], const int dy[]) {
+    int count = 0;
     for (int i = 0; i < 8; i++) {
-        int nextX = x + dx[i];
-        int nextY = y + dy[i];
+        if (isSafe(x + dx[i], y + dy[i], N, board)) count++;
+    }
+    return count;
+}
 
-        if (isSafe(nextX, nextY, N, board)) {
-            board[nextX][nextY] = moveNum;
-            
-            if (solveKnightTour(nextX, nextY, moveNum + 1, N, board, dx, dy)) {
-                return true;
-            }
-            
-            board[nextX][nextY] = -1; 
+// Recursive backtracking 
+bool solveKnightTour(int x, int y, int moveNum, int N, vector<vector<int>>& board, const int dx[], const int dy[]) {
+    if (moveNum == N * N + 1) return true; // All squares visited
+
+    // Collect valid moves 
+    vector<pair<int, int>> candidates;
+    for (int i = 0; i < 8; i++) {
+        int nx = x + dx[i];
+        int ny = y + dy[i];
+        if (isSafe(nx, ny, N, board)) {
+            candidates.push_back({countMoves(nx, ny, N, board, dx, dy), i});
         }
+    }
+
+    // Try squares with fewest onward moves first
+    sort(candidates.begin(), candidates.end());
+
+    for (auto& c : candidates) {
+        int nextX = x + dx[c.second];
+        int nextY = y + dy[c.second];
+
+        board[nextX][nextY] = moveNum;
+
+        if (solveKnightTour(nextX, nextY, moveNum + 1, N, board, dx, dy)) {
+            return true;
+        }
+
+        board[nextX][nextY] = -1; // Backtrack
     }
     return false;
 }
@@ -45,7 +66,7 @@ int main() {
         return 0;
     }
 
-    // Initialize board with -1 (unvisited)
+    // Initialize board with -1
     vector<vector<int>> board(N, vector<int>(N, -1));
 
     // Eight possible knight moves (L-shaped)
