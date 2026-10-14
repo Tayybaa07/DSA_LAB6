@@ -2,7 +2,7 @@
 #include <vector>
 
 using namespace std;
-
+//Starting
 // Reads student Ids into the array
 void inputIDs(vector<int>& arr, int n) {
     cout << "Enter " << n << " student IDs: ";
